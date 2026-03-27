@@ -1,66 +1,76 @@
-
 # Proyecto Base: Pruebas Visual Regression Testing (VRT) con Pixelmatch
 
-[PixelMatch](https://github.com/mapbox/pixelmatch/blob/main/README.md) es una biblioteca de JavaScript para la comparación de imágenes a nivel de píxel, especialmente diseñada para detectar diferencias entre imágenes, por ejemplo, en pruebas de regresión. Es rápida y eficiente, trabajando con arrays de datos de imágenes y no dependiente de otras bibliotecas. 
+[PixelMatch](https://github.com/mapbox/pixelmatch/blob/main/README.md) es una biblioteca de JavaScript para la comparación de imágenes a nivel de píxel, especialmente diseñada para detectar diferencias entre imágenes, por ejemplo, en pruebas de regresión. Es rápida y eficiente, trabajando con arrays de datos de imágenes y no dependiente de otras bibliotecas.
 
-## Caracteristicas Principles:
-*Comparación de imágenes:*
-Permite comparar dos imágenes y determinar si hay diferencias entre ellas. 
+## Caracteristicas Principles
 
-*A nivel de píxel:*
-Analiza cada píxel individualmente para detectar diferencias. 
+_Comparación de imágenes:_
+Permite comparar dos imágenes y determinar si hay diferencias entre ellas.
 
-*Para pruebas:*
-Ideal para comparar imágenes en pruebas de regresión, donde se busca detectar cambios no deseados. 
+_A nivel de píxel:_
+Analiza cada píxel individualmente para detectar diferencias.
 
-*Rápida y eficiente:*
-Diseñada para ser rápida y no depender de otras bibliotecas, lo que la hace adecuada para pruebas automatizadas. 
+_Para pruebas:_
+Ideal para comparar imágenes en pruebas de regresión, donde se busca detectar cambios no deseados.
 
-## Detalles adicionales:
+_Rápida y eficiente:_
+Diseñada para ser rápida y no depender de otras bibliotecas, lo que la hace adecuada para pruebas automatizadas.
 
-*Funciones de comparación:*
-Incluye funciones para comparar imágenes basadas en la percepción del color (métricas de color perceptual) y para detectar píxeles antialiased. 
+## Detalles adicionales
 
-*Uso en pruebas automatizadas:*
-Es común encontrarla en pruebas de integración continua, donde se comparan capturas de pantalla para asegurar que no haya cambios inesperados. 
+_Funciones de comparación:_
+Incluye funciones para comparar imágenes basadas en la percepción del color (métricas de color perceptual) y para detectar píxeles antialiased.
 
-*Implementación:*
-Es una biblioteca relativamente pequeña y simple, con una implementación en alrededor de 120 líneas de código. 
+_Uso en pruebas automatizadas:_
+Es común encontrarla en pruebas de integración continua, donde se comparan capturas de pantalla para asegurar que no haya cambios inesperados.
 
-*Versatilidad:*
-Puede ser utilizada tanto en entornos de navegador como en entornos Node.js. 
+_Implementación:_
+Es una biblioteca relativamente pequeña y simple, con una implementación en alrededor de 120 líneas de código.
+
+_Versatilidad:_
+Puede ser utilizada tanto en entornos de navegador como en entornos Node.js.
 
 ## Requisitos Básicos
 
-- Node.js (versión 20 o superior). Recomendamos utilizar la versión `lts/iron`.
-- npm o yarn para la gestión de dependencias.
+- Node.js (versión 22 o superior). Recomendamos utilizar la versión `lts/jod`.
+- npm para la gestión de dependencias.
 
 ## Instalación
 
-Instala las dependencias necesarias utilizando npm:
+Desde la **raíz del repositorio**:
+
+```bash
+npm run pixelmatch:install
+npm run pixelmatch:prepare
+```
+
+O bien, desde el directorio del módulo:
 
 ```bash
 npm install
+npm run prepare
 ```
 
 ## Ejecución de Pruebas VRT
 
-Puedes ejecutar las pruebas en modo headless para Chrome, Firefox y Electron
+Desde la **raíz del repositorio**:
 
-- Para ejecutar las pruebas en modo headless:
+- Para ejecutar las pruebas en modo headless con Chromium (navegador por defecto):
 
-    ```bash
-    npm run test
-    ```
+  ```bash
+  npm run pixelmatch:test
+  ```
 
-- Para ver los resultados de las pruebas uan vez termine la ejecucion:
+- Para ver el reporte HTML de Playwright una vez termine la ejecución:
 
   ```bash
   npx playwright show-report
   ```
 
-- Para generar el reporte básico con la generación de imágenes
+- Para generar el reporte básico con las imágenes comparadas (ejecutar después de `pixelmatch:test`):
 
   ```bash
-  npm run report
+  npm run pixelmatch:report
   ```
+
+> **Nota:** El módulo usa `"type": "module"` (ES Modules) dado que `playwright.config.js` y `index.js` utilizan la sintaxis `import`/`export`.
