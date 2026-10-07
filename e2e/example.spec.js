@@ -1,16 +1,15 @@
 import { test } from '@playwright/test';
 import fs from 'fs';
+import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
-import { options } from '../vrt.config';
+import { options } from '../vrt.config.js';
 
 test.describe("color-palette", () => {
   let beforePath = "";
   let afterPath = "";
   let comparePath = "";
-  let pixelmatch;
 
   test.beforeAll(async ({ browserName }, testInfo) => {
-    pixelmatch = (await import('pixelmatch')).default;
     beforePath = testInfo.outputPath(`before-${browserName}.png`);
     afterPath = testInfo.outputPath(`after-${browserName}.png`);
     comparePath = testInfo.outputPath(`compare-${browserName}.png`);

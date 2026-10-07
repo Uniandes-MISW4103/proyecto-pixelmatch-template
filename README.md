@@ -1,76 +1,95 @@
-# Proyecto Base: Pruebas Visual Regression Testing (VRT) con Pixelmatch
+# Proyecto Base: Pruebas de Regresión Visual (VRT) con Pixelmatch
 
-[PixelMatch](https://github.com/mapbox/pixelmatch/blob/main/README.md) es una biblioteca de JavaScript para la comparación de imágenes a nivel de píxel, especialmente diseñada para detectar diferencias entre imágenes, por ejemplo, en pruebas de regresión. Es rápida y eficiente, trabajando con arrays de datos de imágenes y no dependiente de otras bibliotecas.
+[pixelmatch](https://github.com/mapbox/pixelmatch) es una librería pequeña y rápida que compara dos
+imágenes píxel a píxel, detecta el _antialiasing_ y genera una imagen con las diferencias. En este
+módulo se combina con [Playwright Test](https://playwright.dev), que toma las capturas de pantalla.
 
-## Caracteristicas Principles
+Este módulo contiene la configuración base y un ejemplo de regresión visual que pueden usar como
+punto de partida para comparar versiones de la aplicación del proyecto.
 
-_Comparación de imágenes:_
-Permite comparar dos imágenes y determinar si hay diferencias entre ellas.
+## Requisitos
 
-_A nivel de píxel:_
-Analiza cada píxel individualmente para detectar diferencias.
-
-_Para pruebas:_
-Ideal para comparar imágenes en pruebas de regresión, donde se busca detectar cambios no deseados.
-
-_Rápida y eficiente:_
-Diseñada para ser rápida y no depender de otras bibliotecas, lo que la hace adecuada para pruebas automatizadas.
-
-## Detalles adicionales
-
-_Funciones de comparación:_
-Incluye funciones para comparar imágenes basadas en la percepción del color (métricas de color perceptual) y para detectar píxeles antialiased.
-
-_Uso en pruebas automatizadas:_
-Es común encontrarla en pruebas de integración continua, donde se comparan capturas de pantalla para asegurar que no haya cambios inesperados.
-
-_Implementación:_
-Es una biblioteca relativamente pequeña y simple, con una implementación en alrededor de 120 líneas de código.
-
-_Versatilidad:_
-Puede ser utilizada tanto en entornos de navegador como en entornos Node.js.
-
-## Requisitos Básicos
-
-- Node.js (versión 22 o superior). Recomendamos utilizar la versión `lts/jod`.
-- npm para la gestión de dependencias.
+- Node.js 24 (`lts/krypton`). El módulo incluye un `.nvmrc`, por lo que pueden usar `nvm use`.
+- npm (incluido con Node.js).
+- Navegador: `prepare` descarga Chromium para Playwright. En Linux (por ejemplo, en un servidor de
+  CI) también se necesitan librerías del sistema: `npx playwright install --with-deps chromium`.
 
 ## Instalación
 
-Desde la **raíz del repositorio**:
+Desde la **raíz del repositorio** del proyecto:
 
 ```bash
 npm run pixelmatch:install
 npm run pixelmatch:prepare
 ```
 
-O bien, desde el directorio del módulo:
+> [!IMPORTANT]
+> Instalen siempre desde la raíz. `pixelmatch:install` deja las dependencias del módulo en su propia
+> carpeta `node_modules`, aisladas de los demás módulos. Un `npm install` dentro de la carpeta del
+> módulo instala en la raíz del repositorio y modifica el `package-lock.json` raíz sin ese aislamiento.
 
-```bash
-npm install
-npm run prepare
+## Ejecución
+
+| Acción | Desde la raíz | Desde `vrt/misw-4103-pixelmatch` |
+|---|---|---|
+| Tomar las capturas y compararlas | `npm run pixelmatch:test` | `npm test` |
+| Generar el reporte de imágenes (después de `test`) | `npm run pixelmatch:report` | `npm run report` |
+| Ver el reporte HTML de Playwright | — | `npx playwright show-report` |
+
+El reporte de imágenes queda en `test-results/<carpeta-de-la-prueba>/index.html` dentro del módulo,
+junto a las capturas `before-*.png`, `after-*.png` y la diferencia `compare-*.png`.
+
+## Estructura
+
+```plaintext
+misw-4103-pixelmatch/
+├── .nvmrc
+├── package.json
+├── playwright.config.js   # configuración de Playwright Test
+├── vrt.config.js          # opciones de pixelmatch
+├── index.js               # genera el reporte HTML de imágenes
+├── public/index.css       # estilos del reporte
+└── e2e/
+    └── example.spec.js    # ejemplo incluido
 ```
 
-## Ejecución de Pruebas VRT
+`test-results/` y `playwright-report/` están en el `.gitignore`, igual que todos los `*.png` y
+`*.html` del módulo.
 
-Desde la **raíz del repositorio**:
+## Configuración
 
-- Para ejecutar las pruebas en modo headless con Chromium (navegador por defecto):
+- **`playwright.config.js`**: `use.baseURL` es la URL base de la aplicación (por defecto
+  `https://monitor177.github.io`); `outputDir` es `./test-results`; solo se usa Chromium.
+- **`vrt.config.js`**: opciones que se pasan a `pixelmatch`:
+  - `threshold` (0 a 1): sensibilidad por píxel; valores menores detectan diferencias más pequeñas.
+  - `includeAA`: si es `true`, los píxeles de _antialiasing_ también cuentan como diferencia.
+  - `alpha`: opacidad de la imagen original en el fondo de la imagen de diferencias.
+  - `aaColor` y `diffColor`: colores con los que se pintan el _antialiasing_ y las diferencias.
 
-  ```bash
-  npm run pixelmatch:test
-  ```
+## Ejemplo incluido
 
-- Para ver el reporte HTML de Playwright una vez termine la ejecución:
+`e2e/example.spec.js` abre `https://monitor177.github.io/color-palette`, toma una captura, hace clic
+en "Generar nueva paleta" (`#generate`, que cambia los colores al azar), toma otra captura y las
+compara con `pixelmatch`. `report` arma una página con las tres imágenes.
 
-  ```bash
-  npx playwright show-report
-  ```
+El ejemplo **no tiene aserciones**: siempre pasa y sirve para ver el flujo completo. En sus pruebas
+usen el valor que retorna `pixelmatch` (cantidad de píxeles distintos) para decidir si hay una
+regresión, y comparen la misma página en dos versiones de la aplicación.
 
-- Para generar el reporte básico con las imágenes comparadas (ejecutar después de `pixelmatch:test`):
+## Solución de problemas
 
-  ```bash
-  npm run pixelmatch:report
-  ```
+- **`Executable doesn't exist at …`**: falta el navegador; ejecuten `npm run pixelmatch:prepare`.
+- **`Image sizes do not match`**: pixelmatch solo compara imágenes del mismo tamaño; usen el mismo
+  _viewport_ (y `fullPage` igual) en las dos capturas.
+- **`No test result folders found`** al generar el reporte: ejecuten antes `pixelmatch:test`. Si
+  cambian el nombre del archivo, del `describe` o de la prueba, actualicen `OUTPUT_FOLDER_PREFIX` en
+  `index.js`, porque Playwright nombra la carpeta de resultados con ellos.
+- **Al fallar una prueba la terminal se queda esperando**: Playwright abrió su reporte HTML; usen
+  `Ctrl+C` o definan `PW_TEST_HTML_REPORT_OPEN=never`.
+- **Advertencia `EBADENGINE`**: están usando una versión de Node.js anterior a la 24.
 
-> **Nota:** El módulo usa `"type": "module"` (ES Modules) dado que `playwright.config.js` y `index.js` utilizan la sintaxis `import`/`export`.
+## Referencias
+
+- [pixelmatch](https://github.com/mapbox/pixelmatch)
+- [Capturas de pantalla en Playwright](https://playwright.dev/docs/screenshots)
+- [Documentación de Playwright Test](https://playwright.dev/docs/intro)
