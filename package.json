@@ -33,9 +33,11 @@
     "report": "node index.js"
   },
   "dependencies": {
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.14.1",
-    "pixelmatch": "^7.1.0",
-    "pngjs": "^7.0.0"
+    "@playwright/test": "~1.63.0",
+    "pixelmatch": "~8.0.0",
+    "pngjs": "~7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "~24.19.1"
   }
 }
