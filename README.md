@@ -66,10 +66,6 @@ misw-4103-pixelmatch/
   - `alpha`: opacidad de la imagen original en el fondo de la imagen de diferencias.
   - `aaColor` y `diffColor`: colores con los que se pintan el _antialiasing_ y las diferencias.
 
-> [!NOTE]
-> El módulo usa pixelmatch 8, que calcula la diferencia de color de forma distinta a la versión 7:
-> la cantidad de píxeles distintos para las mismas imágenes no es comparable entre versiones.
-
 ## Ejemplo incluido
 
 `e2e/example.spec.js` abre `https://monitor177.github.io/color-palette`, toma una captura, hace clic
