@@ -45,6 +45,7 @@ junto a las capturas `before-*.png`, `after-*.png` y la diferencia `compare-*.pn
 misw-4103-pixelmatch/
 ├── .nvmrc
 ├── package.json
+├── abp.cjs                # lee la configuración de la aplicación bajo pruebas (.env)
 ├── playwright.config.js   # configuración de Playwright Test
 ├── vrt.config.js          # opciones de pixelmatch
 ├── index.js               # genera el reporte HTML de imágenes
@@ -58,8 +59,21 @@ misw-4103-pixelmatch/
 
 ## Configuración
 
-- **`playwright.config.js`**: `use.baseURL` es la URL base de la aplicación (por defecto
-  `https://monitor177.github.io`); `outputDir` es `./test-results`; solo se usa Chromium.
+La URL de las dos versiones y el administrador de la aplicación bajo pruebas (ABP) están en el
+archivo `.env` de la raíz del repositorio, el mismo que usa `npm run abp:up` para desplegar Ghost. No
+los copien en el módulo: `abp.cjs` lee ese archivo. Las variables disponibles son `ABP_URL` (versión
+base), `ABP_RC_URL` (versión nueva), `ABP_ADMIN_NAME`, `ABP_ADMIN_EMAIL` y `ABP_ADMIN_PASSWORD`. Una
+variable de entorno con el mismo nombre tiene prioridad sobre el `.env`; fuera de un repositorio del
+proyecto (sin `.env`) se usan los valores por defecto de `abp.cjs`. Las pruebas importan las variables así:
+
+```javascript
+import abp from "../abp.cjs";
+
+await page.goto(`${abp.ABP_RC_URL}/ghost/`);
+```
+
+- **`playwright.config.js`**: `use.baseURL` es `ABP_URL`, la versión base de la aplicación
+  (`page.goto("/ghost/")`); `outputDir` es `./test-results`; solo se usa Chromium.
 - **`vrt.config.js`**: opciones que se pasan a `pixelmatch`:
   - `threshold` (0 a 1): sensibilidad por píxel; valores menores detectan diferencias más pequeñas.
   - `includeAA`: si es `true`, los píxeles de _antialiasing_ también cuentan como diferencia.
@@ -68,13 +82,16 @@ misw-4103-pixelmatch/
 
 ## Ejemplo incluido
 
-`e2e/example.spec.js` abre `https://monitor177.github.io/color-palette`, toma una captura, hace clic
-en "Generar nueva paleta" (`#generate`, que cambia los colores al azar), toma otra captura y las
-compara con `pixelmatch`. `report` arma una página con las tres imágenes.
+`e2e/example.spec.js` abre la página de registro del demo
+[angular-6-registration-login-example](https://angular-6-registration-login-example.stackblitz.io) alojado en StackBlitz (no la ABP), inicia el proyecto
+y toma una captura; llena el formulario con el nombre, el correo y la contraseña de `ABP_ADMIN_*`,
+toma otra captura y las compara con `pixelmatch`. `report` arma una página con las tres imágenes.
+Muestra cómo usar las credenciales del `.env` sin resolver las pruebas del proyecto.
 
 El ejemplo **no tiene aserciones**: siempre pasa y sirve para ver el flujo completo. En sus pruebas
 usen el valor que retorna `pixelmatch` (cantidad de píxeles distintos) para decidir si hay una
-regresión, y comparen la misma página en dos versiones de la aplicación.
+regresión, y comparen la misma página en las dos versiones de la aplicación (`ABP_URL` y
+`ABP_RC_URL`).
 
 ## Solución de problemas
 
