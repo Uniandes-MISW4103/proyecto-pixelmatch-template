@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 
 const TEST_OUTPUT_DIR = "./test-results";
-const PAGE_URL = "https://monitor177.github.io/color-palette";
-const OUTPUT_FOLDER_PREFIX = "example-color-palette-vrt-";
+const PAGE_URL = "https://angular-6-registration-login-example.stackblitz.io/register";
+const OUTPUT_FOLDER_PREFIX = "example-registration-vrt-";
 
 function browserSection(browserName) {
   return `<div class="browser" id="browser-${browserName}">
